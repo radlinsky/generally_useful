@@ -420,7 +420,7 @@ def new_sub_dir_file(File_path, Appendage):
 	if len(Appendage) == 0:
 		raise ValueError("Appendage was an empty string. It should not be an empty string.")
 	directory = os.path.dirname(File_path)
-	new_file = os.path.join(directory, os.path.basename(directory)+Pattern)
+	new_file = os.path.join(directory, os.path.basename(directory)+Appendage)
 	return new_file
 
 

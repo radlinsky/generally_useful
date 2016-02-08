@@ -2,14 +2,15 @@
 
 ### folderize_by_column.py
 ### Caleb Matthew Radens
-### 2015_2_2
+### 2015_2_8
 
 ### This script parses a file by a specified column, and writes to
 ###  file groups of rows that match. Files are named by their row group. 
 ###
 ###  Arguments:
 ###    input_file.txt: input txt file
-###	 valid filepath   
+###	 		valid filepath   
+###    delim: how is input file delimted?
 ###    Column_#: which column to group by
 ###	 integer
 ###    output_directory/: where should files by written to?
@@ -32,23 +33,23 @@
 ###    There is a single line header
 ###
 ###  Usage:
-###    python folderize_by_gene.py input_file.txt Column_# output_directory/ keep_*
+###    python folderize_by_gene.py input_file.txt delim Column_# output_directory/ keep_*
 
 import sys
 import os
-import gzip
 import csv
 from subprocess import call
 
 print "Initiating folderize_by_column.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv) != 5):
-	raise Exception("Expected four command arguments.")
+if (len(sys.argv)-1 != 5):
+	raise Exception("Expected five command arguments.")
 in_FILE = str(sys.argv[1])
-Column_index = int(sys.argv[2])
-out_DIR = str(sys.argv[3])
-Keep = str(sys.argv[4])
+delim = str(sys.argv[2])
+Column_index = int(sys.argv[3])
+out_DIR = str(sys.argv[4])
+Keep = str(sys.argv[5])
 
 if (in_FILE[-4:] != ".txt"):
 	raise Exception("Expected 1st command argument to be a file name ending in '.txt'")
@@ -161,8 +162,10 @@ except BaseException:
 f_IN = open(in_FILE, 'rb')
 line_i = 1
 for line in f_IN:
+	if delim not in line:
+		raise ValueError("Delim: "+delim+" doesn't seem to be the delim for the input file...")
 	# Remove newline chars and split by tab
-	split_line = line.rstrip('\r\n').split('\t')
+	split_line = line.rstrip('\r\n').split(delim)
 	# First line is header, save it and look at the next line
 	if line_i == 1:
 		# If you want to keep all columns:
@@ -210,11 +213,7 @@ for line in f_IN:
 		# Write the contents of the row_group file list to a csv in its own directory
 		filename = out_DIR+row_group+"/"+row_group+".BED.csv"
 		if not os.path.exists(os.path.dirname(filename)):
-			try:
-				os.makedirs(os.path.dirname(filename))
-			except OSError as exc: # Guard against race condition
-				if exc.errno != errno.EEXIST:
-					raise
+			os.makedirs(os.path.dirname(filename))
 		with open(filename, "wb") as f:
 			writer = csv.writer(f)
 			writer.writerows(row_group_file)

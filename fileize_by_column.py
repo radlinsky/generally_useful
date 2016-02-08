@@ -9,8 +9,8 @@
 ###
 ###  Arguments:
 ###    input_file.txt: input txt file
-###	 valid filepath   
-###    Column_#: which column to group by
+###	 		valid filepath   
+###    delim: how is input file delimted?###    Column_#: which column to group by
 ###	 integer
 ###    output_directory/: where should files by written to?
 ###      Extant directory
@@ -32,23 +32,23 @@
 ###    There is a single line header
 ###
 ###  Usage:
-###    python folderize_by_gene.py input_file.txt Column_# output_directory/ keep_*
+###    python folderize_by_gene.py input_file.txt delim Column_# output_directory/ keep_*
 
 import sys
 import os
-import gzip
 import csv
 from subprocess import call
 
 print "Initiating fileize_by_column.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv) != 5):
-	raise Exception("Expected four command arguments.")
+if (len(sys.argv)-1 != 5):
+	raise Exception("Expected five command arguments.")
 in_FILE = str(sys.argv[1])
-Column_index = int(sys.argv[2])
-out_DIR = str(sys.argv[3])
-Keep = str(sys.argv[4])
+delim = str(sys.argv[2])
+Column_index = int(sys.argv[3])
+out_DIR = str(sys.argv[4])
+Keep = str(sys.argv[5])
 
 if (in_FILE[-4:] != ".txt"):
 	raise Exception("Expected 1st command argument to be a file name ending in '.txt'")
@@ -161,8 +161,10 @@ except BaseException:
 f_IN = open(in_FILE, 'rb')
 line_i = 1
 for line in f_IN:
+	if delim not in line:
+		raise ValueError("Delim: '"+delim+"' doesn't seem to be the delim for the input file...")
 	# Remove newline chars and split by tab
-	split_line = line.rstrip('\r\n').split('\t')
+	split_line = line.rstrip('\r\n').split(delim)
 	# First line is header, save it and look at the next line
 	if line_i == 1:
 		# If you want to keep all columns:
