@@ -67,7 +67,7 @@ if not os.path.isdir(os.path.dirname(out_FILE)):
     raise ValueError(out_FILE+" can't be written because the parent dir doesn't exist.")
 if col_i < 0:
     raise Exception("col_i needs to be an integer >= 0.")
-if replace != "y" or replace != "n":
+if replace != "y" and replace != "n":
     raise ValueError("replace needs to be 'y' or 'n' [lowercase]")
 
 # Initiate new file
