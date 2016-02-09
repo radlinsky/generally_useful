@@ -73,9 +73,9 @@ if replace != "y" and replace != "n":
 # Initiate new file
 split_file_rows = list()
 with open(in_FILE, 'rb') as file_handle:
-    content = file_handle.readlines()
     i = 0
-    for line in content:
+    # Skip lines until i >= skip
+    for line in file_handle:
         if i < skip:
             continue
         if file_delim not in line:
