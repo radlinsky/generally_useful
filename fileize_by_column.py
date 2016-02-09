@@ -31,6 +31,7 @@
 ###    The file is a .txt file
 ###    There is a single line header
 ###
+###
 ###  Usage:
 ###    python folderize_by_gene.py input_file.txt delim Column_# output_directory/ keep_*
 
@@ -54,6 +55,10 @@ if (in_FILE[-4:] != ".txt"):
 	raise Exception("Expected 1st command argument to be a file name ending in '.txt'")
 if not (os.path.isfile(in_FILE)):
 	raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
+# from bash, >>> python \t sends a 't' to python. >>> python $'\t' sends \t.
+#    this little check assumes user meant \t
+if "t" in delim and len(delim)==1:
+	delim = "\t"
 if not type(Column_index) is int or Column_index < 0:
 	raise Exception("Column index needs to be an integer >= 0.")
 if not (os.path.isdir(out_DIR)):

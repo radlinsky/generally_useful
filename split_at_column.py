@@ -61,6 +61,10 @@ replace = str(sys.argv[7])
 
 if not (os.path.isfile(in_FILE)):
     raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
+# from bash, >>> python \t sends a 't' to python. >>> python $'\t' sends \t.
+#    this little check assumes user meant \t
+if "t" in file_delim and len(file_delim)==1:
+    file_delim = "\t"
 if not skip >= 0:
     raise ValueError("skip should be integer >= 0")
 if not os.path.isdir(os.path.dirname(out_FILE)):
