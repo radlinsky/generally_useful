@@ -359,7 +359,7 @@ def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header =
 		# If not sorted:
 		if test_sorted == 1:
 			# This sorts the file, but skips the header when sorting it, and writes the result to file
-			command = "tail -n +2 " + in_file_path + " | sort -t "+Delim+" -"+Sort_style+"k " + sort_at
+			command = "tail -n +2 " + in_file_path + " | sort -t "+Delim+" -"+Sort_style+"k " + sort_at + " >> " + out_file_path
 			call([command], shell = True)
 		# Else not sorted, just return original file path
 		else:
@@ -376,7 +376,7 @@ def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header =
 		if test_sorted == 1:
 		
 			
-			command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at
+			command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at + " > " + out_file_path
 			call([command], shell = True)
 		# Else file is already sorted
 		else:
