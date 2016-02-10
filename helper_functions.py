@@ -299,15 +299,17 @@ def my_head(File, Dir="", Lines=10):
 			print line
 			Lines = Lines-1
 
-def bash_sort(File, In_dir, Out_dir, Col, Header = True):
+def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header = True):
 	""" Bash sort a file, return location of sorted file.
 
 		Arguments:
-			File: 	"my_fav_file.txt"
-			In_dir: "/my_directory/" [optional, you may make File a the full filepath instead
-			Out_dir:"/some_dir" where sorted file is saved
-			Col:	integer. Which column to sort by? [1 = first column]
-			Header: boolean. Does the file have a header?
+			File: 		"my_fav_file.txt"
+			In_dir: 	"/my_directory/" [optional, you may make File a the full filepath instead
+			Out_dir:	"/some_dir" where sorted file is saved
+			Col:		integer. Which column to sort by? [1 = first column]
+			Delim:		string. If tab, must be '\\t'
+			Sort_style:	string. 'n' or '' ['n' if column is numeric, empty if not]
+			Header: 	boolean. Does the file have a header?
 
 		Assumptions:
 			File is not gz-zipped (or compressed at all)
@@ -317,8 +319,8 @@ def bash_sort(File, In_dir, Out_dir, Col, Header = True):
 		Returns: filepath of the sorted file
 	"""
 	if type(File) is not str or type(In_dir) is not str or type(Out_dir) is not str:
-		raise ValueError("File, In_dir, and Out_dir need to be strings.")
-	if type(Col) is not int or Col < 0:
+		raise TypeError("File, In_dir, and Out_dir need to be strings.")
+	if type(Col) is not int or Col <= 0:
 		raise ValueError("Col needs to be an integer > 0.")
 	if len(In_dir) > 0:	
 		if not (os.path.isdir(In_dir)):
@@ -334,30 +336,51 @@ def bash_sort(File, In_dir, Out_dir, Col, Header = True):
 		raise ValueError("Please only use this function on .txt files.")
 	if not os.path.isfile(In_dir+File):
 		raise ValueError(File+" not found in directory\n"+In_dir)
+	if type(Sort_style) is not str:
+		raise TypeError("Sort_style needs to be a string")
+	if Sort_style != "n" and Sort_style != "":
+		raise ValueError("Sort_style needs to be 'n' or '', not: "+Sort_style)
 
 	print "Passed bash_sort checks."
 
-	in_file_path = In_dir + File
+	in_file_path = In_dir + File	
 	out_file_path = Out_dir + File[:-4]+"_sorted.txt"
-	print out_file_path
 	if Header:
 		# Save the header to out_file
 		command = "head " + in_file_path + " -n 1 > " + out_file_path
-		print "bash_sort command looks like: \n"+command
 		call([command], shell= True)
 		# Which column will be sorted by
 		sort_at = str(Col)+","+str(Col)
-		# This sorts the file, but skips the header when sorting it, and writes teh result to file
-		command = "tail -n +2 " + in_file_path + " | sort -k " + sort_at + " >> " + out_file_path
-		print "bash_sort command looks like: \n"+command
-		call([command], shell = True)
+		
+		# This command is for checking if the column is already sorted.
+		check_if_sorted_command = "tail -n +2 " + in_file_path + " | sort -t "+Delim+" -"+Sort_style+"k " + sort_at + " -c"
+		test_sorted = call([check_if_sorted_command], shell = True)
+		# If not sorted:
+		if test_sorted == 1:
+			# This sorts the file, but skips the header when sorting it, and writes the result to file
+			command = "tail -n +2 " + in_file_path + " | sort -t "+Delim+" -"+Sort_style+"k " + sort_at
+			call([command], shell = True)
+		# Else not sorted, just return original file path
+		else:
+			# Delete out_file that was going to be sorted
+			command = "rm "+out_file_path
+			call([command], shell = True)
+			return in_file_path
 	# Else no header
 	else:
-		# Sort the file at specified column
-		sort_at = str(Col)+","+str(Col)
-		command = "sort "+in_file_path + " -k " + sort_at + " > " + out_file_path
-		print "bash_sort command looks like: \n"+command
-		call([command], shell=True)
+		# This command is for checking if the column is already sorted.
+		check_if_sorted_command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at + " -c"
+		test_sorted = call([check_if_sorted_command], shell = True)
+		# If not sorted:
+		if test_sorted == 1:
+		
+			# Sort the file at specified column
+			sort_at = str(Col)+","+str(Col)
+			command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at
+			call([command], shell = True)
+		# Else file is already sorted
+		else:
+			return in_file_path
 
 	return out_file_path
 
