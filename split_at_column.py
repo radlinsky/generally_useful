@@ -77,9 +77,9 @@ if replace != "y" and replace != "n":
 # Initiate new file
 #split_file_rows = list()
 # Write new file
-with open(out_FILE, 'wb') as file_handle:
-    writer = csv.writer(file_handle)
-    with open(in_FILE, 'rb') as csv_file_handle:
+with open(out_FILE, 'wb') as csv_file_handle:
+    writer = csv.writer(csv_file_handle)
+    with open(in_FILE, 'rb') as file_handle:
         i = 0
         # Skip lines until i >= skip
         for line in file_handle:
