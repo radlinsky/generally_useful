@@ -74,11 +74,10 @@ if col_i < 0:
 if replace != "y" and replace != "n":
     raise ValueError("replace needs to be 'y' or 'n' [lowercase]")
 
-# Initiate new file
-#split_file_rows = list()
-# Write new file
+# Open output file
 with open(out_FILE, 'wb') as csv_file_handle:
     writer = csv.writer(csv_file_handle)
+    # Open input file
     with open(in_FILE, 'rb') as file_handle:
         i = 0
         # Skip lines until i >= skip
@@ -86,7 +85,7 @@ with open(out_FILE, 'wb') as csv_file_handle:
             if i < skip:
                 continue
             if file_delim not in line:
-                raise ValueError("Delim: '"+file_delim+"' doesn't seem to be the delim for the input file...")
+                raise ValueError("Delim: '"+file_delim+"' doesn't seem to be the delim this line:\n"+line)
             split_line = line.rstrip('\r\n').split(file_delim)
             
             # Pop off column if replace = 'y'
@@ -105,15 +104,9 @@ with open(out_FILE, 'wb') as csv_file_handle:
             while len(split_col) > 0:
                 split_line.insert(0, split_col.pop())
             
-            # Add row with column split up to the new data file
-            #split_file_rows.append(split_line)
+            # Write row with column split up to the new file
             writer.writerows(split_line)
             i = i + 1
-
-# Write new file
-#with open(out_FILE, 'wb') as file_handle:
-#    writer = csv.writer(file_handle)
-#    writer.writerows(split_file_rows)
 
 
 
