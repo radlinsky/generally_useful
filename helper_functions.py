@@ -152,12 +152,12 @@ def submit_scisub_job(Command):
 	call([Command[0]],shell=True)
 
 def make_consign_job_command(
-	Language = "python",
 	Script,
 	ScriptDir,
 	ErrOut=True,
 	ErrOutDir = "",
-	Extra=""):
+	Extra="",
+	Language = "python"):
 	"""Generate an appropriately formatted string for submitting a *python* job on consign.pmacs
 	
 	Arguments:
