@@ -40,17 +40,16 @@ def index_all(array, element):
 	return matched_indices
 
 def make_scisub_job_command(
-	Language="python",
 	Script,
 	ScriptDir,
 	Queue = "voight_normal",
 	ErrOut=True,
 	ErrOutDir = "",
-	Extra=""):
+	Extra="",
+	Language="python"):
 	"""Generate an appropriately formatted string for submitting a *python* job on pmacs.
 	
 	Arguments:
-		Language:		programming language to execute job in
 		Script: 		"script_to_execute.py"
 		ScriptDir: 		"/directory_with_script/"
 		Queue:			Scisub -q command. Should be: "voight_normal" (default),
@@ -59,6 +58,7 @@ def make_scisub_job_command(
 		ErrOutDir:		"/directory_for_log_files/"
 		Extra:			Optional string. If the script takes command line arguments,
 							add them here.
+		Language:		programming language to execute job in (defaults to python)
 
 	Depends on: os
 
@@ -66,13 +66,13 @@ def make_scisub_job_command(
 
 		Example usage:
 		make_scisub_job_command(
-			Language="python"
 			Script="my_script.py",
 			ScriptDir="/project/voight_subrate/.../scripts/",
 			Queue = "voight_normal",
 			ErrOut=True,
 			ErrOutDir = "/project/voight_subrate/.../logs/",
-			Extra="cowabung baby")
+			Extra="cowabung baby"
+			Language="python")
 
 		Example output :
 		(note, output is a list of 2 strings with no line breaks/newlines, I just broke them here
@@ -161,13 +161,14 @@ def make_consign_job_command(
 	"""Generate an appropriately formatted string for submitting a *python* job on consign.pmacs
 	
 	Arguments:
-		Language:		programming language to execute job in
 		Script: 		"script_to_execute.py"
 		ScriptDir: 		"/directory_with_script/"
 		ErrOut:			Boolean. Should the job save log files?
 		ErrOutDir:		"/directory_for_log_files/"
 		Extra:			Optional string. If the script takes command line arguments,
 							add them here.
+		Language:		programming language to execute job in (defaults to python)
+
 
 	Depends on: os
 
@@ -175,12 +176,12 @@ def make_consign_job_command(
 
 		Example usage:
 		make_consign_job_command(
-			Language="python"
 			Script="my_script.py",
 			ScriptDir="/project/chrbrolab/.../scripts/",
 			ErrOut=True,
 			ErrOutDir = "/project/chrbrolab/.../logs/",
-			Extra="cowabung baby")
+			Extra="cowabung baby"
+			Language="python")
 
 		Example output :
 		(note, output is a list of 2 strings with no line breaks/newlines,
