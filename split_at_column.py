@@ -105,7 +105,7 @@ with open(out_FILE, 'wb') as csv_file_handle:
                 split_line.insert(0, split_col.pop())
             
             # Write row with column split up to the new file
-            writer.writerows(split_line)
+            writer.writerow(split_line)
             i = i + 1
 
 
