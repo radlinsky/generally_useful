@@ -2,38 +2,40 @@
 
 ### folderize_by_column.py
 ### Caleb Matthew Radens
-### 2015_2_2
+### 2015_2_10
 
 ### This script parses a file by a specified column, and writes to
 ###  file groups of rows that match. Files are csvs named: row_group.txt
 ###
-###  Arguments:
-###    input_file.txt: input txt file
-###	 		valid filepath   
-###    delim: how is input file delimted?###    Column_#: which column to group by
-###	 integer
-###    output_directory/: where should files by written to?
-###      Extant directory
-###    keep_*: which columns from the file to keep (order matters) when writing new files.
-###      keep_all = keep all columns in new files
-###      keep_0_1_2 = keep first 3 columns in new files
-###      keep_6_2_4 = keep the 7th, 3rd, and 5th columns..
-###	 NOTE: preserves order of input file if 'all' or order of input columns, if specified
+###	Arguments:
+###		input_file.txt: input txt file
+###			valid filepath   
+###		delim: how is input file delimted?
+###		head: Is there a single-lined header?
+###			integer (0 or 1)
+###		Column_#: which column to group by
+###			integer
+###		output_directory/: where should files by written to?
+###			Extant directory
+###		keep_*: which columns from the file to keep (order matters) when writing new files.
+###			keep_all = keep all columns in new files
+###			keep_0_1_2 = keep first 3 columns in new files
+###			keep_6_2_4 = keep the 7th, 3rd, and 5th columns..
+###			NOTE: preserves order of input file if 'all' or order of input columns, if specified
 ###
-###  Assumptions:
-###    The file is bash-sortable by the column of interest
-###    The 'Column_#' command line argument is a valid column index
-###	Type = <int>
-###     (0 = first column)
-###    The column of interest has no empty values
-###    The column of interest does not have any rows with value='INITIATED'
-###    The file is not zipped/compressed
-###    The file is a .txt file
-###    There is a single line header
+###	Assumptions:
+###		The file is bash-sortable by the column of interest
+###		The 'Column_#' command line argument is a valid column index
+###			Type = <int>
+###			(0 = first column)
+###		The column of interest has no empty values
+###		The column of interest does not have any rows with value='INITIATED'
+###		The file is not zipped/compressed
+###		The file is a .txt file
+###		There is a single line header or no header at all
 ###
-###
-###  Usage:
-###    python folderize_by_gene.py input_file.txt delim Column_# output_directory/ keep_*
+###	Usage:
+###		python fileize_by_gene.py input_file.txt delim head Column_# output_directory/ keep_*
 
 import sys
 import os
@@ -43,13 +45,14 @@ from subprocess import call
 print "Initiating fileize_by_column.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv)-1 != 5):
-	raise Exception("Expected five command arguments.")
+if (len(sys.argv)-1 != 6):
+	raise Exception("Expected six command arguments.")
 in_FILE = str(sys.argv[1])
 delim = str(sys.argv[2])
-Column_index = int(sys.argv[3])
-out_DIR = str(sys.argv[4])
-Keep = str(sys.argv[5])
+head = int(sys.argv[3])
+Column_index = int(sys.argv[4])
+out_DIR = str(sys.argv[5])
+Keep = str(sys.argv[6])
 
 if (in_FILE[-4:] != ".txt"):
 	raise Exception("Expected 1st command argument to be a file name ending in '.txt'")
@@ -59,6 +62,8 @@ if not (os.path.isfile(in_FILE)):
 #    this little check assumes user meant \t
 if "t" in delim and len(delim)==1:
 	delim = "\t"
+if head != 0 and head != 1:
+	raise ValueError("head needs to be integer: 0 or 1. Not: "+str(head))
 if not type(Column_index) is int or Column_index < 0:
 	raise Exception("Column index needs to be an integer >= 0.")
 if not (os.path.isdir(out_DIR)):
@@ -96,15 +101,17 @@ print "Keeping column(s): "+str(cols_to_keep)
 all_row_groups = list()
 row_group = "INITIATED"
 
-def bash_sort(File, In_dir, Out_dir, Col, Header = True):
+def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header = True):
 	""" Bash sort a file, return location of sorted file.
 
 		Arguments:
-			File: 	"my_fav_file.txt"
-			In_dir: "/my_directory/" [optional, you may make File a the full filepath instead
-			Out_dir:"/some_dir" where sorted file is saved
-			Col:	integer. Which column to sort by? [1 = first column]
-			Header: boolean. Does the file have a header?
+			File: 		"my_fav_file.txt"
+			In_dir: 	"/my_directory/" [optional, you may make File a the full filepath instead
+			Out_dir:	"/some_dir" where sorted file is saved
+			Col:		integer. Which column to sort by? [1 = first column]
+			Delim:		string. If tab, must be '\\t'
+			Sort_style:	string. 'n' or '' ['n' if column is numeric, empty if not]
+			Header: 	boolean. Does the file have a header?
 
 		Assumptions:
 			File is not gz-zipped (or compressed at all)
@@ -114,8 +121,8 @@ def bash_sort(File, In_dir, Out_dir, Col, Header = True):
 		Returns: filepath of the sorted file
 	"""
 	if type(File) is not str or type(In_dir) is not str or type(Out_dir) is not str:
-		raise ValueError("File, In_dir, and Out_dir need to be strings.")
-	if type(Col) is not int or Col < 0:
+		raise TypeError("File, In_dir, and Out_dir need to be strings.")
+	if type(Col) is not int or Col <= 0:
 		raise ValueError("Col needs to be an integer > 0.")
 	if len(In_dir) > 0:	
 		if not (os.path.isdir(In_dir)):
@@ -131,26 +138,51 @@ def bash_sort(File, In_dir, Out_dir, Col, Header = True):
 		raise ValueError("Please only use this function on .txt files.")
 	if not os.path.isfile(In_dir+File):
 		raise ValueError(File+" not found in directory\n"+In_dir)
+	if type(Sort_style) is not str:
+		raise TypeError("Sort_style needs to be a string")
+	if Sort_style != "n" and Sort_style != "":
+		raise ValueError("Sort_style needs to be 'n' or '', not: "+Sort_style)
 
 	print "Passed bash_sort checks."
 
-	in_file_path = In_dir + File
+	in_file_path = In_dir + File	
 	out_file_path = Out_dir + File[:-4]+"_sorted.txt"
+	
+	# Which column will be sorted by
+	sort_at = str(Col)+","+str(Col)
 	if Header:
 		# Save the header to out_file
 		command = "head " + in_file_path + " -n 1 > " + out_file_path
 		call([command], shell= True)
-		# Which column will be sorted by
-		sort_at = str(Col)+","+str(Col)
-		# This sorts the file, but skips the header when sorting it, and writes teh result to file
-		command = "tail -n +2 " + in_file_path + " | sort -k " + sort_at + " >> " + out_file_path
-		call([command], shell = True)
+				
+		# This command is for checking if the column is already sorted.
+		check_if_sorted_command = "tail -n +2 " + in_file_path + " | sort -t "+Delim+" -"+Sort_style+"k " + sort_at + " -c"
+		test_sorted = call([check_if_sorted_command], shell = True)
+		# If not sorted:
+		if test_sorted == 1:
+			# This sorts the file, but skips the header when sorting it, and writes the result to file
+			command = "tail -n +2 " + in_file_path + " | sort -t "+Delim+" -"+Sort_style+"k " + sort_at + " >> " + out_file_path
+			call([command], shell = True)
+		# Else not sorted, just return original file path
+		else:
+			# Delete out_file that was going to be sorted
+			command = "rm "+out_file_path
+			call([command], shell = True)
+			return in_file_path
 	# Else no header
 	else:
-		# Sort the file at specified column
-		sort_at = str(Col)+","+str(Col)
-		command = "sort "+in_file_path + " -k " + sort_at + " > " + out_file_path
-		call([command], shell=True)
+		# This command is for checking if the column is already sorted.
+		check_if_sorted_command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at + " -c"
+		test_sorted = call([check_if_sorted_command], shell = True)
+		# If not sorted:
+		if test_sorted == 1:
+		
+			
+			command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at + " > " + out_file_path
+			call([command], shell = True)
+		# Else file is already sorted
+		else:
+			return in_file_path
 
 	return out_file_path
 
