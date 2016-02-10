@@ -129,8 +129,8 @@ def make_scisub_job_command(
 		Extra = " "+Extra
 
 	if ErrOut:
-		command = "bsub -e "+ErrOutDir+Script[0:-2]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+"err "
-		command = command + "-o "+ErrOutDir+Script[0:-2:]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+"out "
+		command = "bsub -e "+ErrOutDir+Script[0:-2]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+".err "
+		command = command + "-o "+ErrOutDir+Script[0:-2:]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+".out "
 		command = command + "-q "+Queue
 		command = command + language +ScriptDir+Script+Extra
 	else:
@@ -230,8 +230,8 @@ def make_consign_job_command(
 		Extra = " "+Extra
 
 	if ErrOut:
-		command = "bsub -e "+ErrOutDir+Script[0:-2]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+"err "
-		command = command + "-o "+ErrOutDir+Script[0:-2:]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+"out "
+		command = "bsub -e "+ErrOutDir+Script[0:-2]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+".err "
+		command = command + "-o "+ErrOutDir+Script[0:-2:]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+".out "
 		command = command + language + ScriptDir+Script+Extra
 	else:
 		command = "bsub "
