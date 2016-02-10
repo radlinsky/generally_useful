@@ -99,8 +99,8 @@ def make_scisub_job_command(
 	if type(ErrOut) is not bool:
 		raise ValueError("ErrOut needs to be a boolean.")
 
-	if Script[-2:] != "py":
-		raise ValueError("Expected a .py python script, instead got: "+Script)
+	if Script[-2:] != "py" and Script[-2:] != "R":
+		raise ValueError("Expected a .py python or .R R script, instead got: "+Script)
 
 	if not (os.path.isdir(ScriptDir)):
 		raise ValueError(ScriptDir+" not found.")
