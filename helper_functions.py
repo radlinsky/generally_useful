@@ -9,6 +9,7 @@
 import os
 from subprocess import call
 import gzip
+import time
 
 
 def remove_all(array, element):
@@ -39,6 +40,7 @@ def index_all(array, element):
 	return matched_indices
 
 def make_scisub_job_command(
+	Language="python",
 	Script,
 	ScriptDir,
 	Queue = "voight_normal",
@@ -48,6 +50,7 @@ def make_scisub_job_command(
 	"""Generate an appropriately formatted string for submitting a *python* job on pmacs.
 	
 	Arguments:
+		Language:		programming language to execute job in
 		Script: 		"script_to_execute.py"
 		ScriptDir: 		"/directory_with_script/"
 		Queue:			Scisub -q command. Should be: "voight_normal" (default),
@@ -63,6 +66,7 @@ def make_scisub_job_command(
 
 		Example usage:
 		make_scisub_job_command(
+			Language="python"
 			Script="my_script.py",
 			ScriptDir="/project/voight_subrate/.../scripts/",
 			Queue = "voight_normal",
@@ -74,12 +78,18 @@ def make_scisub_job_command(
 		(note, output is a list of 2 strings with no line breaks/newlines, I just broke them here
 			to ease visualization)
 
-		['bsub -e /project/voight_subrate/.../logs/my_script.err
-			   -o /project/voight_subrate/.../logs/my_script.out
+		['bsub -e /project/voight_subrate/.../logs/my_script_year_month_day_hr_min_sec.err
+			   -o /project/voight_subrate/.../logs/my_script_year_month_day_hr_min_sec.out
 			   -q voight_normal
 			   python /project/voight_subrate/.../scripts/my_script.py cowabunga baby',
 		'IS_COMMAND']
 	"""
+	# Languages I'm comfortable submitting jobs in:
+	ACCEPTABLE_LANGUAGES = ["python", "R"]
+	if Language not in ACCEPTABLE_LANGUAGES:
+		raise ValueError(str(Language)+" not one of the following: "+str(ACCEPTABLE_LANGUAGES))
+	else:
+		language = " "+Language+" "
 	if (type(Script) is not str 
 		or type(ScriptDir) is not str 
 		or type(Queue) is not str 
@@ -119,14 +129,14 @@ def make_scisub_job_command(
 		Extra = " "+Extra
 
 	if ErrOut:
-		command = "bsub -e "+ErrOutDir+Script[0:-2]+"err "
-		command = command + "-o "+ErrOutDir+Script[0:-2:]+"out "
+		command = "bsub -e "+ErrOutDir+Script[0:-2]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+"err "
+		command = command + "-o "+ErrOutDir+Script[0:-2:]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+"out "
 		command = command + "-q "+Queue
-		command = command + " python "+ScriptDir+Script+Extra
+		command = command + language +ScriptDir+Script+Extra
 	else:
 		command = "bsub "
 		command = command + "-q "+Queue
-		command = command + " python "+ScriptDir+Script+Extra
+		command = command + language +ScriptDir+Script+Extra
 
 	return [command, "IS_SCISUB_COMMAND"]
 
@@ -142,6 +152,7 @@ def submit_scisub_job(Command):
 	call([Command[0]],shell=True)
 
 def make_consign_job_command(
+	Language = "python",
 	Script,
 	ScriptDir,
 	ErrOut=True,
@@ -150,6 +161,7 @@ def make_consign_job_command(
 	"""Generate an appropriately formatted string for submitting a *python* job on consign.pmacs
 	
 	Arguments:
+		Language:		programming language to execute job in
 		Script: 		"script_to_execute.py"
 		ScriptDir: 		"/directory_with_script/"
 		ErrOut:			Boolean. Should the job save log files?
@@ -163,6 +175,7 @@ def make_consign_job_command(
 
 		Example usage:
 		make_consign_job_command(
+			Language="python"
 			Script="my_script.py",
 			ScriptDir="/project/chrbrolab/.../scripts/",
 			ErrOut=True,
@@ -173,11 +186,17 @@ def make_consign_job_command(
 		(note, output is a list of 2 strings with no line breaks/newlines,
 			 I just broke them here	to ease visualization)
 
-		['bsub 	-e /project/chrbrolab/.../logs/my_script.err
-			-o /project/chrbrolab/.../logs/my_script.out
+		['bsub 	-e /project/chrbrolab/.../logs/my_script_year_month_day_hr_min_sec.err
+			-o /project/chrbrolab/.../logs/my_script_year_month_day_hr_min_sec.out
 			python /project/chrbrolab/.../scripts/my_script.py cowabunga baby',
 		'IS_CONSIGN_COMMAND']
 	"""
+	# Languages I'm comfortable submitting jobs in:
+	ACCEPTABLE_LANGUAGES = ["python", "R"]
+	if Language not in ACCEPTABLE_LANGUAGES:
+		raise ValueError(str(Language)+" not one of the following: "+str(ACCEPTABLE_LANGUAGES))
+	else:
+		language = " "+Language+" "
 	if (type(Script) is not str 
 		or type(ScriptDir) is not str 
 		or type(ErrOutDir) is not str 
@@ -210,12 +229,12 @@ def make_consign_job_command(
 		Extra = " "+Extra
 
 	if ErrOut:
-		command = "bsub -e "+ErrOutDir+Script[0:-2]+"err "
-		command = command + "-o "+ErrOutDir+Script[0:-2:]+"out "
-		command = command + " python "+ScriptDir+Script+Extra
+		command = "bsub -e "+ErrOutDir+Script[0:-2]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+"err "
+		command = command + "-o "+ErrOutDir+Script[0:-2:]+"_"+time.strftime("%Y_%m_%d_%H_%M_%S")+"out "
+		command = command + language + ScriptDir+Script+Extra
 	else:
 		command = "bsub "
-		command = command + " python "+ScriptDir+Script+Extra
+		command = command + language + ScriptDir+Script+Extra
 
 	return [command, "IS_CONSIGN_COMMAND"]
 
