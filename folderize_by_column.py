@@ -160,7 +160,7 @@ def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header =
 		call([command], shell= True)
 				
 		# This command is for checking if the column is already sorted.
-		check_if_sorted_command = "tail -n +2 " + in_file_path + " | sort -t "+Delim+" -"+Sort_style+"k " + sort_at + " -c"
+		check_if_sorted_command = "tail -n +2 " + in_file_path + " | awk -F"+Delim+" '{print $"+str(Col)+"}' | sort -c"
 		test_sorted = call([check_if_sorted_command], shell = True)
 		# If not sorted:
 		if test_sorted == 1:
@@ -176,12 +176,10 @@ def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header =
 	# Else no header
 	else:
 		# This command is for checking if the column is already sorted.
-		check_if_sorted_command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at + " -c"
+		check_if_sorted_command = "awk -F"+Delim+" '{print $"+str(Col)+"}' " + in_file_path + " | sort -c"
 		test_sorted = call([check_if_sorted_command], shell = True)
 		# If not sorted:
 		if test_sorted == 1:
-		
-			
 			command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at + " > " + out_file_path
 			call([command], shell = True)
 		# Else file is already sorted
