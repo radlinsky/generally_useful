@@ -71,7 +71,7 @@ if not type(Column_index) is int or Column_index < 0:
 	raise Exception("Column index needs to be an integer >= 0.")
 if type(sort_style) is not str:
 	raise TypeError("sort_style needs to be a string")
-if sort_style != "n" and sort_style != "":
+if sort_style != "n" and sort_style != "s":
 	raise ValueError("sort_style needs to be 'n' or 's', not: "+sort_style)
 if not (os.path.isdir(out_DIR)):
 	raise ValueError(out_DIR+" not found. Is it a valid directory?")
