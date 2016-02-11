@@ -237,7 +237,8 @@ def make_consign_job_command(
 	if ErrOut:
 		time_stamp = time.strftime("%Y_%m_%d_%H_%M_%S")
 		command = "bsub -e "+ErrOutDir+Script[0:-2]+"_"+time_stamp+".err "
-		command = command + "-o "+ErrOutDir+Script[0:-2:]+"_"+time_stamp+".out "
+		command = command + " -e " + ErrOutDir+Script[0:-2]+"_"+time_stamp+".err "
+		command = command + "-o " + ErrOutDir+Script[0:-2:]+"_"+time_stamp+".out "
 		command = command + language + ScriptDir+Script+Extra
 	else:
 		command = "bsub "
