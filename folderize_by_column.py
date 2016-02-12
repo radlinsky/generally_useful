@@ -15,7 +15,7 @@
 ###		head: Is there a single-lined header?
 ###			integer (0 or 1)
 ###		Column_#: which column to group by
-###			integer
+###			integer (0 is first column)
 ###		Sort_style: 'n' if column is numeric. 's' if column is string.
 ###		output_directory/: where should files by written to?
 ###			Extant directory
@@ -153,7 +153,7 @@ def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header =
 	out_file_path = Out_dir + File[:-4]+"_sorted.txt"
 	
 	# Which column will be sorted by
-	sort_at = str(Col)+","+str(Col)
+	sort_at = str(Col)
 	if Header:
 		# Save the header to out_file
 		command = "head " + in_file_path + " -n 1 > " + out_file_path
@@ -162,6 +162,7 @@ def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header =
 		# This command is for checking if the column is already sorted.
 		check_if_sorted_command = "tail -n +2 " + in_file_path + " | awk -F"+Delim+" '{print $"+str(Col)+"}' | sort -c"
 		test_sorted = call([check_if_sorted_command], shell = True)
+		print "(don't worry if it says something about a broken pipe... that's normal. I think.)"
 		# If not sorted:
 		if test_sorted == 1:
 			# This sorts the file, but skips the header when sorting it, and writes the result to file
@@ -178,6 +179,7 @@ def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header =
 		# This command is for checking if the column is already sorted.
 		check_if_sorted_command = "awk -F"+Delim+" '{print $"+str(Col)+"}' " + in_file_path + " | sort -c"
 		test_sorted = call([check_if_sorted_command], shell = True)
+		print "(don't worry if it says something about a broken pipe... that's normal. I think.)"
 		# If not sorted:
 		if test_sorted == 1:
 			command = "sort "+in_file_path+" -t "+Delim+" -"+Sort_style+"k " + sort_at + " > " + out_file_path
@@ -205,6 +207,8 @@ try:
 				Header = True)
 except BaseException:
 	raise StandardError("bash_sort failed.")
+
+print "Successfully sorted input file."
 
 all_row_groups = list()
 row_group = "INITIATED"
