@@ -50,7 +50,7 @@ if not (os.path.isfile(in_FILE)):
     raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
 
 # If tab-delimited, need to make sure it will be python-interpretable:
-if delim != "," or delim != "tab":
+if delim != "," and delim != "tab":
     raise ValueError("delim needs to be ',' or 'tab', not '"+delim+"'")
     
 if skip < 0:
