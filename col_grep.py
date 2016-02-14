@@ -43,7 +43,7 @@ skip = int(sys.argv[3])
 Column_index = int(sys.argv[4])
 out_DIR = str(sys.argv[5])
 
-pdb.set_trace()
+#pdb.set_trace()
 
 if not (os.path.isfile(in_FILE)):
     raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
