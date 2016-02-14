@@ -30,7 +30,7 @@
 
 import sys, os
 from subprocess import Popen
-import pdb
+import time
 
 print "Initiating folderize_by_column.py"
 print "Argument List:", str(sys.argv[1:])
@@ -62,7 +62,8 @@ if os.path.isfile("cowabunga.py"):
     print "FYI, we're overwriting something called 'cowabunga.py'"
 with open("cowabunga.py", 'wb') as handle:
     handle.write("#!/usr/bin/python\n")
-    handle.write("import sys, os\nfrom subprocess import call\n")
+    handle.write("import sys, os, pdb\nfrom subprocess import call\n")
+    #handle.write("pdb.set_trace()\n")
     handle.write("in_FILE = str(sys.argv[1])\n")
     handle.write("files = str(sys.argv[2])\n")
     handle.write("out_DIR = str(sys.argv[3])\n")
@@ -93,11 +94,11 @@ with open(in_FILE, 'rb') as handle:
         else:
             raise ValueError("Line "+str(i)+" was empty in col of interest.")
         i+=1
-lines_not_skipped = i-skip+1
+lines_not_skipped = i-skip
 
 # If tab-delimited, need to make sure it will be bash-interpretable:
-if "t" in delim:
-    delim = r"\t"
+if "\t" in delim:
+    delim = "$'\t'"
 
 # Want to grep 10 groups at a time from the file.
 ten = list()
@@ -121,6 +122,9 @@ for group in groups:
 
 # Delete the sub-routine. For now......
 #  mwahahaha
+while len(os.listdir(out_DIR)-1) < n_groups:
+    print "Waiting for all job instances of cowabunga.py to be submitted..."
+    time.sleep(1)
 os.remove("cowabunga.py")
 
 print "Processed "+str(lines_not_skipped)+" lines from file:\n"+in_FILE
