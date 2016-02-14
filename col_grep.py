@@ -47,9 +47,9 @@ pdb.set_trace()
 
 if not (os.path.isfile(in_FILE)):
     raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
-# If tab-delimited, need to make sure it will be bash-interpretable:
+# If tab-delimited, need to make sure it will be python-interpretable:
 if "t" in delim:
-    delim = r"\t"
+    delim = "\t"
 if skip < 0:
     raise ValueError("Skip needs to be integer >= 0")
 if Column_index < 0:
@@ -94,6 +94,10 @@ with open(in_FILE, 'rb') as handle:
             raise ValueError("Line "+str(i)+" was empty in col of interest.")
         i+=1
 lines_not_skipped = i-skip+1
+
+# If tab-delimited, need to make sure it will be bash-interpretable:
+if "t" in delim:
+    delim = r"\t"
 
 # Want to grep 10 groups at a time from the file.
 ten = list()
