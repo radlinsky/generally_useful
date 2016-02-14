@@ -30,6 +30,7 @@
 
 import sys, os
 from subprocess import Popen
+import pdb
 
 print "Initiating folderize_by_column.py"
 print "Argument List:", str(sys.argv[1:])
@@ -41,6 +42,8 @@ delim = str(sys.argv[2])
 skip = int(sys.argv[3])
 Column_index = int(sys.argv[4])
 out_DIR = str(sys.argv[5])
+
+pdb.set_trace()
 
 if not (os.path.isfile(in_FILE)):
     raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
@@ -56,7 +59,7 @@ if not (os.path.isdir(out_DIR)):
 
 # Sub-python routine
 if os.path.isfile("cowabunga.py"):
-    raise BaseException("Uh oh, someone already made a file called cowabunga.py")
+    print "FYI, we're overwriting something called 'cowabunga.py'"
 with open("cowabunga.py", 'wb') as handle:
     handle.write("#!/usr/bin/python\n")
     handle.write("import sys, os\nfrom subprocess import call\n")
