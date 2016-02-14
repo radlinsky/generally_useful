@@ -44,8 +44,8 @@ out_DIR = str(sys.argv[5])
 
 if not (os.path.isfile(in_FILE)):
     raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
-# If tab-delimited, need to add slash in order for bash to interpret it correctly  
-if "t" in delim and len(delim)==1:
+# If tab-delimited, need to make sure it will be bash-interpretable:
+if "t" in delim:
     delim = r"\t"
 if skip < 0:
     raise ValueError("Skip needs to be integer >= 0")
