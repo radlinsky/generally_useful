@@ -134,9 +134,6 @@ while len(group_check) > 0:
     for f in os.listdir(out_DIR):
         if f in group_check and os.stat(os.path.join(out_DIR,f)).st_size > 0:
             group_check.remove(f)
-    # Give the program a break: these are files my cowabunga minion script
-    #  are trying to write to.
-    time.sleep(5)
 
 print "=============="
 print "Processed "+str(lines_not_skipped)+" lines into "+str(len(groups))+" groups from file:\n"+in_FILE
