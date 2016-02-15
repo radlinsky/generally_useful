@@ -20,6 +20,8 @@
 ###            integer (0 is first column)
 ###        out_DIR: where should files by written to?
 ###            *Extant* and *empty* directory
+###        folderize: Should each file be put into it's own sub-directory?
+###            'y_fold' or 'n_fold'
 ###
 ###    Assumptions:
 ###        The skipped lines aren't formatted like the rest of the file, and/or the col of interest
@@ -31,7 +33,7 @@
 ###        The out_DIR exists and is EMPTY 
 ###
 ###    Usage:
-###        python grep_col.py in_file.txt delim skip Column_# out_DIR
+###        python grep_col.py in_file.txt delim skip Column_# out_DIR folderize
 ###
 ###    Note:
 ###        I suggest submitting this script as a job and to include the -e err and -o out files.
@@ -43,13 +45,14 @@ import time
 print "Initiating grep_col.py"
 print "Argument List:", str(sys.argv[1:])
 
-if (len(sys.argv)-1 != 5):
-    raise Exception("Expected 5 command arguments.")
+if (len(sys.argv)-1 != 6):
+    raise Exception("Expected 6 command arguments.")
 in_FILE = str(sys.argv[1])
 delim = str(sys.argv[2])
 skip = int(sys.argv[3])
 Column_index = int(sys.argv[4])
 out_DIR = str(sys.argv[5])
+folderize = str(sys.argv[6])
 
 if not (os.path.isfile(in_FILE)):
     raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
@@ -66,8 +69,12 @@ if Column_index < 0:
 
 if not (os.path.isdir(out_DIR)):
     raise ValueError(out_DIR+" not found. Is it a valid + extant directory?")
+
 if len(os.listdir(out_DIR)) > 0:
     raise ValueError(out_DIR+" already contains files. Please choose another dir or empty it.")
+
+if folderize != "y_fold" and folderize != "n_fold":
+    raise ValueError("folderize needs to be 'y_fold' or 'n_fold', not: "+folderize)
 
 # Sub-routine
 if os.path.isfile("cowabunga.py"):
@@ -81,12 +88,18 @@ with open("cowabunga.py", 'wb') as handle:
     handle.write("delim = str(sys.argv[4])\n")
     handle.write("if delim == 'tab':\n\tdelim='\t'\n")
     handle.write("Column_index = int(sys.argv[5])\n")
+    handle.write("folderize = str(sys.argv[6])\n")
     handle.write("files = files.split(',')\n")
     handle.write("col_seps = Column_index * (\".*\"+delim)\n")
     handle.write("for f in files:\n")
-    handle.write("\tout_FILE = os.path.join(out_DIR, f)\n")
+    handle.write("\tif folderize =='n_fold':\n")
+    handle.write("\t\tout_FILE = os.path.join(out_DIR, f)\n")
+    handle.write("\tif folderize =='y_fold':\n")
+    handle.write("\t\tout_DIR = os.path.join(out_DIR, f)\n")
+    handle.write("\t\tout_FILE = os.path.join(out_DIR, f)\n")
     handle.write("\tout = call([\"grep $'\"+col_seps+\"\"+f+\"' \"+in_FILE+\" > \"+out_FILE],shell=True)")
-    
+
+
 # Convert delim to '\t' if it is tab
 if delim == "tab":
     delim_check = '\t'
