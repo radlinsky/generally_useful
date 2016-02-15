@@ -142,7 +142,7 @@ for group in groups:
         # Generate the sys command
         command = in_FILE+" "+joined+" "+out_DIR+" "+delim+" "+str(Column_index)
         # Submit a system command, without waiting. Save error files just in case.
-        proc = Popen(["bsub -e cowabunga.err -o cowabunga.out -q voight_normal python cowabunga.py "+command],shell=True,
+        proc = Popen(["bsub -e cowabunga.err -o cowabunga.out python cowabunga.py "+command],shell=True,
             stdin=None, stdout=None, stderr=None, close_fds=True)
         if i != n_groups:
             ten = list()
