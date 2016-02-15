@@ -30,7 +30,7 @@
 ###        ***The col of interest doesn't have something unix/bash-interpretable in it***
 ###        You're using a LSF job schedule and the following bash command looks familiar:
 ###            > bsub -e error.err -o out.out python my_fav_script.py
-###        The out_DIR exists and is EMPTY 
+###        The out_DIR exists and is *EMPTY*
 ###
 ###    Usage:
 ###        python grep_col.py in_file.txt delim skip Column_# out_DIR folderize
@@ -93,11 +93,12 @@ with open("cowabunga.py", 'wb') as handle:
     handle.write("col_seps = Column_index * (\".*\"+delim)\n")
     handle.write("for f in files:\n")
     handle.write("\tif folderize =='n_fold':\n")
-    handle.write("\t\tout_FILE = os.path.join(out_DIR, f)\n")
+    handle.write("\t\tnew_out_FILE = os.path.join(out_DIR, f)\n")
     handle.write("\tif folderize =='y_fold':\n")
-    handle.write("\t\tout_DIR = os.path.join(out_DIR, f)\n")
-    handle.write("\t\tout_FILE = os.path.join(out_DIR, f)\n")
-    handle.write("\tout = call([\"grep $'\"+col_seps+\"\"+f+\"' \"+in_FILE+\" > \"+out_FILE],shell=True)")
+    handle.write("\t\tnew_out_DIR = os.path.join(out_DIR, f)\n")
+    handle.write("\t\tos.makedirs(new_out_DIR)\n")
+    handle.write("\t\tnew_out_FILE = os.path.join(new_out_DIR, f)\n")
+    handle.write("\tout = call([\"grep $'\"+col_seps+\"\"+f+\"' \"+in_FILE+\" > \"+new_out_FILE],shell=True)")
 
 
 # Convert delim to '\t' if it is tab
@@ -140,7 +141,7 @@ for group in groups:
         # Join each element with a comma
         joined=",".join(ten)
         # Generate the sys command
-        command = in_FILE+" "+joined+" "+out_DIR+" "+delim+" "+str(Column_index)
+        command = in_FILE+" "+joined+" "+out_DIR+" "+delim+" "+str(Column_index)+" "+folderize
         # Submit a system command, without waiting. Save error files just in case.
         proc = Popen(["bsub -e cowabunga.err -o cowabunga.out python cowabunga.py "+command],shell=True,
             stdin=None, stdout=None, stderr=None, close_fds=True)
