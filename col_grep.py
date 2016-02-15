@@ -9,7 +9,7 @@
 ###
 ###    Arguments:
 ###        in_FILE
-###            non-zipped
+###            non-zipped!
 ###        delim: how is the input file delimited? 
 ###            for comma, write: ,
 ###            for tab, write: tab
@@ -33,7 +33,7 @@
 ###        python grep_col.py in_file.txt delim skip Column_# out_DIR
 ###
 ###    Note:
-###        Suggest running submitting this script as a job including the -e err and -o out files.
+###        I suggest submitting this script as a job and to include the -e err and -o out files.
 
 import sys, os
 from subprocess import Popen
@@ -61,12 +61,12 @@ if skip < 0:
     raise ValueError("Skip needs to be integer >= 0")
 
 if Column_index < 0:
-    raise ValueError("Skip needs to be integer >= 0")
+    raise ValueError("Column_index needs to be integer >= 0")
 
 if not (os.path.isdir(out_DIR)):
     raise ValueError(out_DIR+" not found. Is it a valid + extant directory?")
 
-# Sub-python routine
+# Sub-routine
 if os.path.isfile("cowabunga.py"):
     print "FYI, we're overwriting something called 'cowabunga.py'"
 with open("cowabunga.py", 'wb') as handle:
