@@ -19,7 +19,7 @@
 ###        Column_index: which column to group by
 ###            integer (0 is first column)
 ###        out_DIR: where should files by written to?
-###            Extant directory
+###            *Extant* and *empty* directory
 ###
 ###    Assumptions:
 ###        The skipped lines aren't formatted like the rest of the file, and/or the col of interest
@@ -28,6 +28,7 @@
 ###        ***The col of interest doesn't have something unix/bash-interpretable in it***
 ###        You're using a LSF job schedule and the following bash command looks familiar:
 ###            > bsub -e error.err -o out.out python my_fav_script.py
+###        The out_DIR exists and is EMPTY 
 ###
 ###    Usage:
 ###        python grep_col.py in_file.txt delim skip Column_# out_DIR
@@ -65,6 +66,8 @@ if Column_index < 0:
 
 if not (os.path.isdir(out_DIR)):
     raise ValueError(out_DIR+" not found. Is it a valid + extant directory?")
+if len(os.listdir(out_DIR)) > 0:
+    raise ValueError(out_DIR+" already contains files. Please choose another dir or empty it.")
 
 # Sub-routine
 if os.path.isfile("cowabunga.py"):
@@ -135,7 +138,9 @@ for group in groups:
 # Wait for all groups to be written to file
 group_check = list(groups)
 while len(group_check) > 0:
+    # look through each file in out_DIR
     for f in os.listdir(out_DIR):
+        # if file name is a group and the file size is > 0:
         if f in group_check and os.stat(os.path.join(out_DIR,f)).st_size > 0:
             group_check.remove(f)
     # Give the program a break: these are files my cowabunga minion script
