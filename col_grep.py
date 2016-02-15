@@ -13,6 +13,7 @@
 ###        delim: how is the input file delimited? 
 ###            for comma, write: ,
 ###            for tab, write: tab
+###            if it's delimted some other way, please let me know and I'll test/update the script
 ###        skip: How many lines to skip?
 ###            integer >= 0
 ###        Column_index: which column to group by
@@ -25,15 +26,20 @@
 ###            in the skipped lines are not grep-identical to any row below the skipped lines in
 ###            the col of interest.
 ###        ***The col of interest doesn't have something unix/bash-interpretable in it***
+###        You're using a LSF job schedule and the following bash command looks familiar:
+###            > bsub -e error.err -o out.out python my_fav_script.py
 ###
 ###    Usage:
 ###        python grep_col.py in_file.txt delim skip Column_# out_DIR
+###
+###    Note:
+###        Suggest running submitting this script as a job including the -e err and -o out files.
 
 import sys, os
 from subprocess import Popen
 import time
 
-print "Initiating folderize_by_column.py"
+print "Initiating grep_col.py"
 print "Argument List:", str(sys.argv[1:])
 
 if (len(sys.argv)-1 != 5):
@@ -44,14 +50,12 @@ skip = int(sys.argv[3])
 Column_index = int(sys.argv[4])
 out_DIR = str(sys.argv[5])
 
-#pdb.set_trace()
-
 if not (os.path.isfile(in_FILE)):
     raise ValueError(in_FILE+" not found. Is it a *full* and valid file path?")
 
 # If tab-delimited, need to make sure it will be python-interpretable:
 if delim != "," and delim != "tab":
-    raise ValueError("delim needs to be ',' or 'tab', not '"+delim+"'")
+    raise ValueError("This script was only tested with ',' or 'tab', not '"+delim+"'")
     
 if skip < 0:
     raise ValueError("Skip needs to be integer >= 0")
