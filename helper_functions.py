@@ -447,7 +447,7 @@ def grep_for_files(Dir, Pattern, Lacks = ""):
 				if len(Lacks)>0:
 					# Skip file if i contains the Lacks string
 					if Lacks in f:
-						next
+						continue
 				matched_files.append(os.path.join(root,f))
 	return matched_files
 
