@@ -411,12 +411,14 @@ def bash_sort(File, In_dir, Out_dir, Col, Delim = "\\t", Sort_style="", Header =
 
 	return out_file_path
 
-def grep_for_files(Dir, Pattern):
+def grep_for_files(Dir, Pattern, Lacks = ""):
 	"""Search a directory (recursively) for files that contain 'Pattern' in their name.
 
 		Arguments:
 			Dir:	"/my_directory/"
 			Pattern:"pattern_to_match"
+			Lacks:   A pattern file needs to lack
+				string
 
 		Assumptions:
 			Dir is extant
@@ -433,12 +435,19 @@ def grep_for_files(Dir, Pattern):
 
 	if len(Pattern) == 0:
 		raise ValueError("Pattern was an empty string. It should not be an empty string.")
+	
+	if not isinstance(Lacks, str):
+		raise ValueError("Lacks needs to be a string (empty '' is fine)")
 
 	matched_files = list()
 	for root, subdirs, files in os.walk(Dir):
 		# ID files that contain the Pattern
 		for f in files:
 			if Pattern in f:
+				if len(Lacks)>0:
+					# Skip file if i contains the Lacks string
+					if Lacks in f:
+						next
 				matched_files.append(os.path.join(root,f))
 	return matched_files
 
