@@ -85,10 +85,10 @@ def make_scisub_job_command(
 		'IS_COMMAND']
 	"""
 	# Languages I'm comfortable submitting jobs in:
-	ACCEPTABLE_LANGUAGES = ["python", "R"]
+	ACCEPTABLE_LANGUAGES = ["python", "R", "bash"]
 	if Language not in ACCEPTABLE_LANGUAGES:
 		raise ValueError(str(Language)+" not one of the following: "+str(ACCEPTABLE_LANGUAGES))
-	elif Language == "python":
+	elif Language == "python" or Language == "bash":
 		language = " "+Language+" "
 	else: 
 		language = " Rscript "
@@ -101,8 +101,8 @@ def make_scisub_job_command(
 	if type(ErrOut) is not bool:
 		raise ValueError("ErrOut needs to be a boolean.")
 
-	if Script[-2:] != "py" and Script[-1:] != "R":
-		raise ValueError("Expected a .py python or .R R script, instead got: "+Script)
+	if Script[-2:] != "py" and Script[-1:] != "R" and Script[-2:] != "sh":
+		raise ValueError("Expected a .py python, .sh shell, or .R R script, instead got: "+Script)
 
 	if not (os.path.isdir(ScriptDir)):
 		raise ValueError(ScriptDir+" not found.")
